@@ -97,6 +97,66 @@ def build_data_agent(database_entry: DatabaseEntry):
             update_list=DataAgentUtility.a_stock_list,
         ),
 
+        # -------------------------- Market Data (US) --------------------------
+
+        DataAgent(
+            uri='Market.SecuritiesInfo.US',
+            depot=DepotMongoDB(primary_keys='stock_identity',
+                               client=mongodb_client,
+                               database='StockAnalysisSystem',
+                               data_table=uri_to_table('Market.SecuritiesInfo.US')),
+            identity_field='stock_identity',
+            datetime_field=None,
+            data_duration=DATA_DURATION_NONE,
+            update_priority=DataAgent.PRIORITY_HIGHEST
+        ),
+
+        DataAgent(
+            uri='TradeData.Stock.Daily.US',
+            depot=DepotMongoDB(primary_keys=['stock_identity', 'trade_date'],
+                               client=mongodb_client,
+                               database='StockDaily',
+                               data_table=uri_to_table('TradeData.Stock.Daily.US')),
+            identity_field='stock_identity',
+            datetime_field='trade_date',
+            data_duration=DATA_DURATION_DAILY,
+        ),
+
+        # -------------------------- Finance Data (US) --------------------------
+
+        DataAgent(
+            uri='Finance.BalanceSheet.US',
+            depot=DepotMongoDB(primary_keys=['stock_identity', 'period'],
+                               client=mongodb_client,
+                               database='StockAnalysisSystem',
+                               data_table=uri_to_table('Finance.BalanceSheet.US')),
+            identity_field='stock_identity',
+            datetime_field='period',
+            data_duration=DATA_DURATION_QUARTER,
+        ),
+
+        DataAgent(
+            uri='Finance.IncomeStatement.US',
+            depot=DepotMongoDB(primary_keys=['stock_identity', 'period'],
+                               client=mongodb_client,
+                               database='StockAnalysisSystem',
+                               data_table=uri_to_table('Finance.IncomeStatement.US')),
+            identity_field='stock_identity',
+            datetime_field='period',
+            data_duration=DATA_DURATION_QUARTER,
+        ),
+
+        DataAgent(
+            uri='Finance.CashFlowStatement.US',
+            depot=DepotMongoDB(primary_keys=['stock_identity', 'period'],
+                               client=mongodb_client,
+                               database='StockAnalysisSystem',
+                               data_table=uri_to_table('Finance.CashFlowStatement.US')),
+            identity_field='stock_identity',
+            datetime_field='period',
+            data_duration=DATA_DURATION_QUARTER,
+        ),
+
         # -------------------------- Finance Data --------------------------
 
         DataAgent(
