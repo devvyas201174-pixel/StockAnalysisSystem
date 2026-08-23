@@ -1,3 +1,4 @@
+import requests
 import pandas as pd
 from os import path
 
@@ -224,6 +225,90 @@ def convert_ts_date_field(df: pd.DataFrame, ts_field: str,
     if sas_field != ts_field:
         del df[ts_field]
     return df
+
+
+# ------------------------------------------------------------------------------------------------------------------
+# Yahoo Finance (US market) helpers.
+#
+# The yfinance package's bundled curl_cffi networking layer does not tolerate a TLS-terminating proxy, so these
+# collectors talk to the same public Yahoo Finance JSON endpoints directly via `requests`, using a plain cookie +
+# crumb handshake (the same one yfinance itself performs internally).
+
+YAHOO_CHART_URL = 'https://query1.finance.yahoo.com/v8/finance/chart/{symbol}'
+YAHOO_QUOTE_SUMMARY_URL = 'https://query2.finance.yahoo.com/v10/finance/quoteSummary/{symbol}'
+YAHOO_CRUMB_URL = 'https://query1.finance.yahoo.com/v1/test/getcrumb'
+YAHOO_USER_AGENT = ('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 '
+                    '(KHTML, like Gecko) Chrome/124.0 Safari/537.36')
+
+__yahoo_session = None
+__yahoo_crumb = None
+
+
+def yahoo_session() -> requests.Session:
+    global __yahoo_session
+    if __yahoo_session is None:
+        __yahoo_session = requests.Session()
+        __yahoo_session.headers.update({'User-Agent': YAHOO_USER_AGENT})
+    return __yahoo_session
+
+
+def yahoo_crumb(force_refresh: bool = False) -> str:
+    global __yahoo_crumb
+    if __yahoo_crumb is None or force_refresh:
+        try:
+            resp = yahoo_session().get(YAHOO_CRUMB_URL, timeout=20)
+            __yahoo_crumb = resp.text.strip() if resp.status_code == 200 else ''
+        except Exception as e:
+            print('Yahoo finance crumb fetch fail: ' + str(e))
+            __yahoo_crumb = ''
+    return __yahoo_crumb
+
+
+def yahoo_fetch_json(url: str, params: dict = None, use_crumb: bool = False, retry: int = 2) -> dict or None:
+    """
+    GET a Yahoo Finance JSON endpoint. Yahoo's crumb tokens can be rejected under load (401/429); on such a
+    response this refreshes the crumb and retries, up to `retry` times.
+    """
+    params = dict(params) if params is not None else {}
+    for attempt in range(retry + 1):
+        if use_crumb:
+            params['crumb'] = yahoo_crumb(force_refresh=(attempt > 0))
+        try:
+            resp = yahoo_session().get(url, params=params, timeout=20)
+            if resp.status_code == 200:
+                return resp.json()
+            if resp.status_code in (401, 429) and use_crumb and attempt < retry:
+                continue
+            print('Yahoo finance fetch fail: HTTP %d for %s' % (resp.status_code, url))
+        except Exception as e:
+            print('Yahoo finance fetch fail: ' + str(e))
+        break
+    return None
+
+
+YAHOO_SAS_EXCHANGE_TABLE = [
+    ('NMS', 'NASDAQ'),
+    ('NGM', 'NASDAQ'),
+    ('NCM', 'NASDAQ'),
+    ('NYQ', 'NYSE'),
+    ('ASE', 'AMEX'),
+    ('PCX', 'ARCA'),
+]
+
+
+def yahoo_exchange_to_sas_exchange(yahoo_exchange: str) -> str:
+    for yahoo_ex, sas_ex in YAHOO_SAS_EXCHANGE_TABLE:
+        if yahoo_exchange == yahoo_ex:
+            return sas_ex
+    return yahoo_exchange if str_available(yahoo_exchange) else 'US'
+
+
+def us_ticker_to_stock_identity(ticker: str, exchange: str = 'NASDAQ') -> str:
+    return ticker.upper() + '.' + exchange
+
+
+def stock_identity_to_us_ticker(stock_identity: str) -> str:
+    return stock_identity.split('.')[0] if str_available(stock_identity) else stock_identity
 
 
 
