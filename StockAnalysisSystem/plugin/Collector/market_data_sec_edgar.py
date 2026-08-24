@@ -9,16 +9,21 @@ from StockAnalysisSystem.core.Utility.CollectorUtility import *
 
 FIELDS = {
     'Market.SecuritiesInfo.US': {
-        'symbol':     'Ticker Symbol',
-        'name':       'Company Name',
-        'sector':     'Sector',
-        'industry':   'Industry',
-        'exchange':   'Exchange',
-        'currency':   'Currency',
-        'country':    'Country',
-        'website':    'Website',
-        'market_cap': 'Market Capitalization',
+        'symbol':                 'Ticker Symbol',
+        'name':                   'Company Name',
+        'industry':               'Industry',
+        'sic_code':               'SIC Code',
+        'exchange':               'Exchange',
+        'state_of_incorporation': 'State Of Incorporation',
+        'category':               'Filer Category',
     },
+}
+
+# SEC's exchange labels aren't uniformly cased/named - normalize the common ones.
+SEC_SAS_EXCHANGE_TABLE = {
+    'NASDAQ': 'NASDAQ',
+    'NYSE':   'NYSE',
+    'CBOE':   'CBOE',
 }
 
 
@@ -26,9 +31,9 @@ FIELDS = {
 
 def plugin_prob() -> dict:
     return {
-        'plugin_name': 'market_data_yfinance',
+        'plugin_name': 'market_data_sec_edgar',
         'plugin_version': '0.0.0.1',
-        'tags': ['yfinance', 'us_market'],
+        'tags': ['sec_edgar', 'us_market'],
     }
 
 
@@ -42,9 +47,7 @@ def plugin_capacities() -> list:
 
 # ----------------------------------------------------------------------------------------------------------------------
 
-def __raw(value: any) -> any:
-    return value.get('raw') if isinstance(value, dict) else value
-
+# submissions: https://www.sec.gov/edgar/sec-api-documentation
 
 def __fetch_securities_info(**kwargs) -> pd.DataFrame or None:
     result = check_execute_test_flag(**kwargs)
@@ -54,31 +57,25 @@ def __fetch_securities_info(**kwargs) -> pd.DataFrame or None:
         if not str_available(ticker):
             return None
 
-        data = yahoo_fetch_json(
-            YAHOO_QUOTE_SUMMARY_URL.format(symbol=ticker),
-            params={'modules': 'assetProfile,price'}, use_crumb=True)
-        if data is None:
+        cik = sec_ticker_to_cik(ticker)
+        if cik is None:
             return None
 
-        query_results = data.get('quoteSummary', {}).get('result') or []
-        if len(query_results) == 0:
+        submission = sec_company_submission(cik)
+        if submission is None:
             return None
 
-        record = query_results[0]
-        profile = record.get('assetProfile', {}) or {}
-        price = record.get('price', {}) or {}
+        exchanges = submission.get('exchanges') or []
+        exchange = SEC_SAS_EXCHANGE_TABLE.get(exchanges[0].upper(), exchanges[0].upper()) if exchanges else 'US'
 
-        exchange = yahoo_exchange_to_sas_exchange(price.get('exchange', ''))
         result = pd.DataFrame([{
-            'symbol':     ticker,
-            'name':       price.get('longName') or price.get('shortName') or ticker,
-            'sector':     profile.get('sector', ''),
-            'industry':   profile.get('industry', ''),
-            'exchange':   exchange,
-            'currency':   price.get('currency', 'USD'),
-            'country':    profile.get('country', ''),
-            'website':    profile.get('website', ''),
-            'market_cap': __raw(price.get('marketCap')),
+            'symbol':                 ticker,
+            'name':                   submission.get('name', ticker),
+            'industry':               submission.get('sicDescription', ''),
+            'sic_code':               submission.get('sic', ''),
+            'exchange':               exchange,
+            'state_of_incorporation': submission.get('stateOfIncorporation', ''),
+            'category':               submission.get('category', ''),
         }])
         result['stock_identity'] = result['symbol'] + '.' + result['exchange']
 

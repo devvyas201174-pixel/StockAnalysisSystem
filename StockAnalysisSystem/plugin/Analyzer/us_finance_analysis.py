@@ -16,8 +16,9 @@ def analysis_us_current_and_quick_ratio(securities: str, time_serial: tuple, dat
     if df is None or len(df) == 0:
         return [AnalysisResult(securities, None, AnalysisResult.SCORE_NOT_APPLIED, 'No data', 'No data')]
 
-    # Annual report only
-    df = df[df['period'].dt.month == 12]
+    # No month-based annual-report filter here: unlike the calendar-year assumption that holds for Chinese
+    # A-share reports, US fiscal years routinely end outside December (e.g. Apple's is late September), and
+    # the collector already restricts Finance.*.US to 10-K (annual) filings, so every period here already is one.
 
     results = []
     for index, row in df.iterrows():
@@ -55,8 +56,9 @@ def analysis_us_roe_roa(securities: str, time_serial: tuple, data_hub: DataHubEn
     if df is None or len(df) == 0:
         return [AnalysisResult(securities, None, AnalysisResult.SCORE_NOT_APPLIED, 'No data', 'No data')]
 
-    # Annual report only
-    df = df[df['period'].dt.month == 12]
+    # No month-based annual-report filter here: unlike the calendar-year assumption that holds for Chinese
+    # A-share reports, US fiscal years routinely end outside December (e.g. Apple's is late September), and
+    # the collector already restricts Finance.*.US to 10-K (annual) filings, so every period here already is one.
 
     results = []
     for index, row in df.iterrows():

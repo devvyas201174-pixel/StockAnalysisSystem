@@ -228,20 +228,18 @@ def convert_ts_date_field(df: pd.DataFrame, ts_field: str,
 
 
 # ------------------------------------------------------------------------------------------------------------------
-# Yahoo Finance (US market) helpers.
+# Yahoo Finance chart endpoint (US market prices).
 #
-# The yfinance package's bundled curl_cffi networking layer does not tolerate a TLS-terminating proxy, so these
-# collectors talk to the same public Yahoo Finance JSON endpoints directly via `requests`, using a plain cookie +
-# crumb handshake (the same one yfinance itself performs internally).
+# The yfinance package's bundled curl_cffi networking layer does not tolerate a TLS-terminating proxy, so the
+# price collector talks to Yahoo's public chart JSON endpoint directly via `requests`. Unlike Yahoo's
+# quoteSummary endpoint (see the SEC EDGAR helpers below, used instead for company info/financials), the chart
+# endpoint needs no cookie/crumb handshake and has proven reliable.
 
 YAHOO_CHART_URL = 'https://query1.finance.yahoo.com/v8/finance/chart/{symbol}'
-YAHOO_QUOTE_SUMMARY_URL = 'https://query2.finance.yahoo.com/v10/finance/quoteSummary/{symbol}'
-YAHOO_CRUMB_URL = 'https://query1.finance.yahoo.com/v1/test/getcrumb'
 YAHOO_USER_AGENT = ('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 '
                     '(KHTML, like Gecko) Chrome/124.0 Safari/537.36')
 
 __yahoo_session = None
-__yahoo_crumb = None
 
 
 def yahoo_session() -> requests.Session:
@@ -252,55 +250,15 @@ def yahoo_session() -> requests.Session:
     return __yahoo_session
 
 
-def yahoo_crumb(force_refresh: bool = False) -> str:
-    global __yahoo_crumb
-    if __yahoo_crumb is None or force_refresh:
-        try:
-            resp = yahoo_session().get(YAHOO_CRUMB_URL, timeout=20)
-            __yahoo_crumb = resp.text.strip() if resp.status_code == 200 else ''
-        except Exception as e:
-            print('Yahoo finance crumb fetch fail: ' + str(e))
-            __yahoo_crumb = ''
-    return __yahoo_crumb
-
-
-def yahoo_fetch_json(url: str, params: dict = None, use_crumb: bool = False, retry: int = 2) -> dict or None:
-    """
-    GET a Yahoo Finance JSON endpoint. Yahoo's crumb tokens can be rejected under load (401/429); on such a
-    response this refreshes the crumb and retries, up to `retry` times.
-    """
-    params = dict(params) if params is not None else {}
-    for attempt in range(retry + 1):
-        if use_crumb:
-            params['crumb'] = yahoo_crumb(force_refresh=(attempt > 0))
-        try:
-            resp = yahoo_session().get(url, params=params, timeout=20)
-            if resp.status_code == 200:
-                return resp.json()
-            if resp.status_code in (401, 429) and use_crumb and attempt < retry:
-                continue
-            print('Yahoo finance fetch fail: HTTP %d for %s' % (resp.status_code, url))
-        except Exception as e:
-            print('Yahoo finance fetch fail: ' + str(e))
-        break
+def yahoo_fetch_json(url: str, params: dict = None) -> dict or None:
+    try:
+        resp = yahoo_session().get(url, params=params, timeout=20)
+        if resp.status_code == 200:
+            return resp.json()
+        print('Yahoo finance fetch fail: HTTP %d for %s' % (resp.status_code, url))
+    except Exception as e:
+        print('Yahoo finance fetch fail: ' + str(e))
     return None
-
-
-YAHOO_SAS_EXCHANGE_TABLE = [
-    ('NMS', 'NASDAQ'),
-    ('NGM', 'NASDAQ'),
-    ('NCM', 'NASDAQ'),
-    ('NYQ', 'NYSE'),
-    ('ASE', 'AMEX'),
-    ('PCX', 'ARCA'),
-]
-
-
-def yahoo_exchange_to_sas_exchange(yahoo_exchange: str) -> str:
-    for yahoo_ex, sas_ex in YAHOO_SAS_EXCHANGE_TABLE:
-        if yahoo_exchange == yahoo_ex:
-            return sas_ex
-    return yahoo_exchange if str_available(yahoo_exchange) else 'US'
 
 
 def us_ticker_to_stock_identity(ticker: str, exchange: str = 'NASDAQ') -> str:
@@ -309,6 +267,76 @@ def us_ticker_to_stock_identity(ticker: str, exchange: str = 'NASDAQ') -> str:
 
 def stock_identity_to_us_ticker(stock_identity: str) -> str:
     return stock_identity.split('.')[0] if str_available(stock_identity) else stock_identity
+
+
+# ------------------------------------------------------------------------------------------------------------------
+# SEC EDGAR helpers (US market company info + financial statements).
+#
+# Free, no API key, no cookie/crumb dance - just a descriptive User-Agent per SEC's fair-use policy
+# (https://www.sec.gov/os/webmaster-faq#developers). Covers every US-listed filer's actual filed financials
+# (10-K/10-Q), sourced straight from XBRL.
+
+SEC_TICKER_CIK_URL = 'https://www.sec.gov/files/company_tickers.json'
+SEC_SUBMISSIONS_URL = 'https://data.sec.gov/submissions/CIK{cik}.json'
+SEC_COMPANY_FACTS_URL = 'https://data.sec.gov/api/xbrl/companyfacts/CIK{cik}.json'
+SEC_USER_AGENT = 'StockAnalysisSystem-US-market-plugin research@example.com'
+
+__sec_session = None
+__sec_ticker_cik_map = None
+
+
+def sec_session() -> requests.Session:
+    global __sec_session
+    if __sec_session is None:
+        __sec_session = requests.Session()
+        __sec_session.headers.update({'User-Agent': SEC_USER_AGENT})
+    return __sec_session
+
+
+def sec_fetch_json(url: str) -> dict or None:
+    try:
+        resp = sec_session().get(url, timeout=20)
+        if resp.status_code == 200:
+            return resp.json()
+        print('SEC EDGAR fetch fail: HTTP %d for %s' % (resp.status_code, url))
+    except Exception as e:
+        print('SEC EDGAR fetch fail: ' + str(e))
+    return None
+
+
+def sec_ticker_to_cik(ticker: str) -> str or None:
+    global __sec_ticker_cik_map
+    if __sec_ticker_cik_map is None:
+        data = sec_fetch_json(SEC_TICKER_CIK_URL) or {}
+        __sec_ticker_cik_map = {v['ticker'].upper(): str(v['cik_str']).zfill(10) for v in data.values()}
+    return __sec_ticker_cik_map.get(ticker.upper())
+
+
+def sec_company_submission(cik: str) -> dict or None:
+    return sec_fetch_json(SEC_SUBMISSIONS_URL.format(cik=cik))
+
+
+def sec_company_facts(cik: str) -> dict or None:
+    return sec_fetch_json(SEC_COMPANY_FACTS_URL.format(cik=cik))
+
+
+def sec_extract_annual_facts(company_facts: dict, tag_candidates: [str], taxonomy: str = 'us-gaap') -> list:
+    """
+    SEC's XBRL tag naming drifts across filing years and companies (e.g. a company may report revenue under
+    'Revenues' in older filings and 'RevenueFromContractWithCustomerExcludingAssessedTax' in newer ones), so
+    this tries each candidate tag in order and returns the annual (10-K, full-year) USD datapoints of the
+    first one that has any.
+    """
+    gaap = (company_facts.get('facts') or {}).get(taxonomy) or {}
+    for tag in tag_candidates:
+        concept = gaap.get(tag)
+        if concept is None:
+            continue
+        usd = (concept.get('units') or {}).get('USD') or []
+        annuals = [d for d in usd if d.get('form') == '10-K' and d.get('fp') == 'FY']
+        if annuals:
+            return annuals
+    return []
 
 
 
