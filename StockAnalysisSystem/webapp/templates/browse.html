@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Browse - StockAnalysisSystem{% endblock %}
+{% block content %}
+<h1>Data Browser</h1>
+
+<form class="filters" method="get">
+  <label>URI
+    <select name="uri">
+      <option value="">-- select --</option>
+      {% for u in uris %}
+      <option value="{{ u }}" {% if u == uri %}selected{% endif %}>{{ u }}</option>
+      {% endfor %}
+    </select>
+  </label>
+  <label>Identity<input type="text" name="identity" value="{{ identity }}" placeholder="e.g. AAPL.NASDAQ (blank = all)"></label>
+  <label>Since<input type="date" name="since" value="{{ since }}"></label>
+  <label>Until<input type="date" name="until" value="{{ until }}"></label>
+  <button type="submit">Query</button>
+  {% if uri %}
+  <a class="secondary" href="{{ url_for('browse_csv', uri=uri, identity=identity, since=since, until=until) }}">
+    <button type="button" class="secondary">Download CSV</button>
+  </a>
+  {% endif %}
+</form>
+
+{% if error %}<div class="error">{{ error }}</div>{% endif %}
+
+{% if table %}
+<table>
+  <thead><tr>{% for c in columns %}<th>{{ c }}</th>{% endfor %}</tr></thead>
+  <tbody>
+    {% for row in table %}
+    <tr>{% for cell in row %}<td>{{ cell }}</td>{% endfor %}</tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Config - StockAnalysisSystem{% endblock %}
+{% block content %}
+<h1>Settings</h1>
+
+<form method="post" class="filters" style="flex-direction: column; align-items: stretch; max-width: 480px;">
+  {% for f in fields %}
+  <label>{{ f }}
+    <input type="{{ 'password' if f == 'NOSQL_DB_PASS' else 'text' }}" name="{{ f }}" value="{{ config.get(f, '') }}">
+  </label>
+  {% endfor %}
+  <button type="submit">Save</button>
+</form>
+{% endblock %}

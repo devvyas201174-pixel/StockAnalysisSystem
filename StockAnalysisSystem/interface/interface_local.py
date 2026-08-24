@@ -99,7 +99,7 @@ class SasUpdateTask(ResourceTask):
 
         self.__clock.reset()
         self.__data_hub.get_data_utility().auto_update(
-            uri=self.__agent.base_uri(), identity=self.__identities,
+            uri=self.__agent.base_uri(), identity=self.__identities, time_serial=self.__time_serial,
             full_update=self.__force, quit_flag=self.__quit_flag, progress=self.progress())
         self.__clock.freeze()
 

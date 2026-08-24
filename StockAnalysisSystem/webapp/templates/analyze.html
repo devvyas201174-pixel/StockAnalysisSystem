@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}Analyze - StockAnalysisSystem{% endblock %}
+{% block content %}
+<h1>Strategy Runner</h1>
+
+<form class="filters" onsubmit="return false;">
+  <label>Securities (comma-separated)
+    <input type="text" id="securities" size="40" placeholder="e.g. AAPL.NASDAQ, LITE.NASDAQ">
+  </label>
+  <label>Since<input type="date" id="since"></label>
+  <label>Until<input type="date" id="until"></label>
+  <button onclick="runAnalysis()">Run Strategy</button>
+  <span class="status" id="run-status"></span>
+</form>
+
+<div class="checkbox-list">
+  {% for a in analyzers %}
+  <label>
+    <input type="checkbox" name="analyzer" value="{{ a.uuid }}" title="{{ a.detail }}">
+    {{ a.name }}
+  </label>
+  {% endfor %}
+</div>
+
+<table id="results" style="display:none;">
+  <thead>
+    <tr><th>Method</th><th>Security</th><th>Period</th><th>Score</th><th>Brief</th><th>Reason</th></tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<script src="{{ url_for('static', filename='poll.js') }}"></script>
+<script>
+function runAnalysis() {
+  var securities = document.getElementById('securities').value;
+  var since = document.getElementById('since').value;
+  var until = document.getElementById('until').value;
+  var analyzers = Array.prototype.slice.call(document.querySelectorAll('input[name=analyzer]:checked')).map(function (el) { return el.value; });
+  var statusEl = document.getElementById('run-status');
+  var table = document.getElementById('results');
+  var tbody = table.querySelector('tbody');
+
+  if (!securities.trim() || analyzers.length === 0) {
+    statusEl.textContent = 'Enter at least one security and pick at least one analyzer.';
+    return;
+  }
+
+  statusEl.textContent = 'Running...';
+  table.style.display = 'none';
+  tbody.innerHTML = '';
+
+  postJSON('/api/execute_analysis', { securities: securities, analyzers: analyzers, since: since, until: until })
+    .then(function (data) {
+      return pollUntilDone('/api/analysis_result/' + data.res_id, function (tick) {
+        statusEl.textContent = tick.finished ? 'Rendering...' : 'Running...';
+      });
+    })
+    .then(function (data) {
+      // The final poll tick already carries { finished: true, rows: [...] }
+      var rows = data.rows || [];
+      rows.forEach(function (r) {
+        var tr = document.createElement('tr');
+        var scoreClass = r.score === 0 ? 'score-0' : (r.score === 100 ? 'score-100' : '');
+        tr.innerHTML =
+          '<td>' + r.method + '</td>' +
+          '<td>' + r.securities + '</td>' +
+          '<td>' + r.period + '</td>' +
+          '<td class="' + scoreClass + '">' + (r.score === null ? 'N/A' : r.score) + '</td>' +
+          '<td>' + r.brief + '</td>' +
+          '<td>' + r.reason + '</td>';
+        tbody.appendChild(tr);
+      });
+      table.style.display = rows.length ? '' : 'none';
+      statusEl.textContent = rows.length ? ('Done - ' + rows.length + ' result(s).') : 'Done - no results.';
+    })
+    .catch(function (err) {
+      statusEl.textContent = 'Error: ' + err;
+    });
+}
+</script>
+{% endblock %}
