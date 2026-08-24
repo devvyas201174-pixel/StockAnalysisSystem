@@ -1,4 +1,5 @@
 import datetime
+import collections.abc
 import pandas as pd
 
 from ..Utility.common import *
@@ -181,7 +182,7 @@ class DataAgent:
             return uri == adapt
         if isinstance(adapt, (set, list, tuple)):
             return uri in adapt
-        if isinstance(adapt, collections.Callable):
+        if isinstance(adapt, collections.abc.Callable):
             return adapt(uri)
         return self.__uri.lower() == uri.lower()
 
@@ -191,7 +192,7 @@ class DataAgent:
             return [merge_on]
         if isinstance(merge_on, (set, list, tuple)):
             return list(merge_on)
-        if isinstance(merge_on, collections.Callable):
+        if isinstance(merge_on, collections.abc.Callable):
             return merge_on()
         return self.__depot.primary_keys()
 
@@ -201,13 +202,13 @@ class DataAgent:
             return [update_list]
         if isinstance(update_list, (set, list, tuple)):
             return list(update_list)
-        if isinstance(update_list, collections.Callable):
+        if isinstance(update_list, collections.abc.Callable):
             return update_list()
         return []
 
     def data_duration(self) -> int:
         data_duration = self.__extra.get('data_duration', DATA_DURATION_AUTO)
-        if isinstance(data_duration, collections.Callable):
+        if isinstance(data_duration, collections.abc.Callable):
             return data_duration()
         return data_duration
 
@@ -215,7 +216,7 @@ class DataAgent:
         ref_range = self.__extra.get('ref_range')
         if isinstance(ref_range, (set, list, tuple)) and len(ref_range) > 2:
             return min(ref_range[0], ref_range[1]), max(ref_range[0], ref_range[1])
-        if isinstance(ref_range, collections.Callable):
+        if isinstance(ref_range, collections.abc.Callable):
             return ref_range()
         return None, None
 
