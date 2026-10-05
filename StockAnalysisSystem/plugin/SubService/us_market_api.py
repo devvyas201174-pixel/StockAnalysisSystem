@@ -1,5 +1,7 @@
 from StockAnalysisSystem.core.Utility.CollectorUtility import us_ticker_to_stock_identity
 from StockAnalysisSystem.core.Utility import unified_model_v2
+from StockAnalysisSystem.core.Utility import unified_model_v21
+from StockAnalysisSystem.core.Utility import unified_model_data
 from StockAnalysisSystem.core.SubServiceManager import SubServiceContext
 
 
@@ -18,6 +20,14 @@ def unified_v2_score(inputs: dict, regime: dict = None) -> dict:
 
 def unified_v2_regime(regime: dict = None) -> dict:
     return unified_model_v2.classify_regime(regime)
+
+
+def unified_v21_score(inputs: dict, regime: dict = None, sector: str = None, industry: str = None) -> dict:
+    return unified_model_v21.score_stock(inputs, regime, sector=sector, industry=industry)
+
+
+def unified_auto_inputs(ticker: str) -> dict:
+    return unified_model_data.auto_inputs(ticker)
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -53,6 +63,10 @@ def init(sub_service_context: SubServiceContext) -> bool:
         'sas_unified_v2_score', unified_v2_score, group='us_market')
     subServiceContext.sas_api.register_sys_call(
         'sas_unified_v2_regime', unified_v2_regime, group='us_market')
+    subServiceContext.sas_api.register_sys_call(
+        'sas_unified_v21_score', unified_v21_score, group='us_market')
+    subServiceContext.sas_api.register_sys_call(
+        'sas_unified_auto_inputs', unified_auto_inputs, group='us_market')
     return True
 
 

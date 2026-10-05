@@ -1,0 +1,392 @@
+{
+ "Technology": {
+  "p2_nde": 0.659396165009313,
+  "p2_cov": 20.87659080615942,
+  "p2_vol": 44.211910966960424,
+  "p3_fcfconv": 101.12229552174867,
+  "p3_sbc": 4.893211422749759,
+  "p7_gpa": 33.31050016300513
+ },
+ "Communication Services": {
+  "p2_nde": 2.423461166612955,
+  "p2_cov": 4.636844302212328,
+  "p2_vol": 32.03576507987754,
+  "p3_fcfconv": 96.43023255813954,
+  "p3_sbc": 1.167365247444665,
+  "p7_gpa": 26.846262988578946
+ },
+ "Consumer Cyclical": {
+  "p2_nde": 2.243203188173437,
+  "p2_cov": 9.091455310021434,
+  "p2_vol": 30.660051381429845,
+  "p3_fcfconv": 101.11294965265807,
+  "p3_sbc": 0.7961439045944146,
+  "p7_gpa": 42.96280942146777
+ },
+ "Consumer Defensive": {
+  "p2_nde": 1.8096093419102075,
+  "p2_cov": 12.003192848020435,
+  "p2_vol": 24.6607884898702,
+  "p3_fcfconv": 99.63792713283549,
+  "p3_sbc": 0.5006051026960894,
+  "p7_gpa": 39.12656875599124
+ },
+ "Healthcare": {
+  "p2_nde": 2.5773838511736633,
+  "p2_cov": 6.205862304021813,
+  "p2_vol": 28.61906319920424,
+  "p3_fcfconv": 126.86886331027031,
+  "p3_sbc": 1.330574991579541,
+  "p7_gpa": 28.02483869249335
+ },
+ "Financial Services": {
+  "p2_nde": 0.9866506967683207,
+  "p2_cov": 25.384625668449196,
+  "p2_vol": 28.245284993013932,
+  "p3_fcfconv": null,
+  "p3_sbc": 1.752985776586951,
+  "p7_gpa": 28.039639884441492
+ },
+ "Industrials": {
+  "p2_nde": 2.1703969522170867,
+  "p2_cov": 8.245971340681644,
+  "p2_vol": 29.167046704730595,
+  "p3_fcfconv": 98.16634424512705,
+  "p3_sbc": 0.474290082879203,
+  "p7_gpa": 18.576588078968005
+ },
+ "Energy": {
+  "p2_nde": 1.0082493812582647,
+  "p2_cov": 9.401315789473685,
+  "p2_vol": 31.060504284598824,
+  "p3_fcfconv": 101.93377388212379,
+  "p3_sbc": 0.8672147764387881,
+  "p7_gpa": 15.073518598187604
+ },
+ "Utilities": {
+  "p2_nde": 5.430967157867058,
+  "p2_cov": 2.6344504558616144,
+  "p2_vol": 18.835050377457527,
+  "p3_fcfconv": -73.8835453589686,
+  "p3_sbc": 0.4837801119984095,
+  "p7_gpa": 8.333983907379691
+ },
+ "Real Estate": {
+  "p2_nde": 4.777315365408061,
+  "p2_cov": 3.844353942678838,
+  "p2_vol": 22.905402061363503,
+  "p3_fcfconv": 138.07391602691484,
+  "p3_sbc": 1.5087021079827585,
+  "p7_gpa": 9.171666802568208
+ },
+ "Basic Materials": {
+  "p2_nde": 2.0444744471675524,
+  "p2_cov": 8.363914049059485,
+  "p2_vol": 29.385319163630086,
+  "p3_fcfconv": 89.03701518205335,
+  "p3_sbc": 0.4924150870738992,
+  "p7_gpa": 14.34509983998161
+ },
+ "industry:Credit Services": {
+  "p2_nde": 8.229648837971421,
+  "p2_cov": 2.0852635149422047,
+  "p2_vol": 40.20901395518544,
+  "p3_fcfconv": null,
+  "p3_sbc": 1.8822599253275425,
+  "p7_gpa": 20.89645476520711
+ },
+ "industry:Banks - Diversified": {
+  "p2_nde": null,
+  "p2_cov": null,
+  "p2_vol": 24.580587498603755,
+  "p3_fcfconv": null,
+  "p3_sbc": 3.469560622960994,
+  "p7_gpa": null
+ },
+ "industry:Banks - Regional": {
+  "p2_nde": null,
+  "p2_cov": null,
+  "p2_vol": 24.47723463159582,
+  "p3_fcfconv": null,
+  "p3_sbc": 1.6012396694214874,
+  "p7_gpa": null
+ },
+ "industry:Software - Application": {
+  "p2_nde": 0.7427998454575788,
+  "p2_cov": 26.884483245481928,
+  "p2_vol": 51.92286699955808,
+  "p3_fcfconv": 217.42089114523003,
+  "p3_sbc": 12.208817177991403,
+  "p7_gpa": 47.64170160152857
+ },
+ "industry:Software - Infrastructure": {
+  "p2_nde": 1.2348187788850475,
+  "p2_cov": 5.258228840125392,
+  "p2_vol": 50.62116175546412,
+  "p3_fcfconv": 150.12402700875947,
+  "p3_sbc": 10.938941928390673,
+  "p7_gpa": 28.94700999450438
+ },
+ "industry:Semiconductors": {
+  "p2_nde": 0.7369400503138084,
+  "p2_cov": 13.617855452070758,
+  "p2_vol": 51.98548287696599,
+  "p3_fcfconv": 102.97399712531035,
+  "p3_sbc": 3.7361702692985483,
+  "p7_gpa": 26.85495799776556
+ },
+ "industry:Biotechnology": {
+  "p2_nde": 0.059464691311425136,
+  "p2_cov": 4.703480598184054,
+  "p2_vol": 33.308139466102645,
+  "p3_fcfconv": 117.24670875344134,
+  "p3_sbc": 5.048443681235183,
+  "p7_gpa": 44.28907224476983
+ },
+ "_market": {
+  "p2_nde": 2.243203188173437,
+  "p2_cov": 7.993070494964645,
+  "p2_vol": 28.19743058607551,
+  "p3_fcfconv": 99.75260424817242,
+  "p3_sbc": 0.9529540456925806,
+  "p7_gpa": 20.262586565976385
+ },
+ "_as_of": "2026-10-05",
+ "_peers": {
+  "Technology": [
+   "MSFT",
+   "AAPL",
+   "NVDA",
+   "ORCL",
+   "ADBE",
+   "CSCO",
+   "TXN",
+   "IBM",
+   "INTU",
+   "QCOM",
+   "AMAT",
+   "CRM"
+  ],
+  "Communication Services": [
+   "GOOGL",
+   "META",
+   "NFLX",
+   "DIS",
+   "CMCSA",
+   "VZ",
+   "T",
+   "TMUS",
+   "EA",
+   "CHTR",
+   "OMC"
+  ],
+  "Consumer Cyclical": [
+   "AMZN",
+   "TSLA",
+   "HD",
+   "MCD",
+   "NKE",
+   "LOW",
+   "SBUX",
+   "BKNG",
+   "TJX",
+   "GM",
+   "ORLY",
+   "CMG"
+  ],
+  "Consumer Defensive": [
+   "PG",
+   "KO",
+   "PEP",
+   "COST",
+   "WMT",
+   "MDLZ",
+   "CL",
+   "KMB",
+   "GIS",
+   "MO",
+   "HSY",
+   "KR"
+  ],
+  "Healthcare": [
+   "JNJ",
+   "UNH",
+   "LLY",
+   "MRK",
+   "ABBV",
+   "PFE",
+   "TMO",
+   "ABT",
+   "DHR",
+   "MDT",
+   "AMGN",
+   "ISRG"
+  ],
+  "Financial Services": [
+   "JPM",
+   "BAC",
+   "V",
+   "MA",
+   "AXP",
+   "COF",
+   "SYF",
+   "GS",
+   "SPGI",
+   "SCHW",
+   "AFRM",
+   "ALLY"
+  ],
+  "Industrials": [
+   "GE",
+   "HON",
+   "UNP",
+   "CAT",
+   "DE",
+   "LMT",
+   "RTX",
+   "UPS",
+   "ITW",
+   "ETN",
+   "WM",
+   "EMR"
+  ],
+  "Energy": [
+   "XOM",
+   "CVX",
+   "COP",
+   "EOG",
+   "SLB",
+   "PSX",
+   "MPC",
+   "OXY",
+   "VLO",
+   "WMB",
+   "KMI",
+   "HAL"
+  ],
+  "Utilities": [
+   "NEE",
+   "DUK",
+   "SO",
+   "D",
+   "AEP",
+   "EXC",
+   "SRE",
+   "XEL",
+   "PEG",
+   "ED",
+   "WEC",
+   "EIX"
+  ],
+  "Real Estate": [
+   "PLD",
+   "AMT",
+   "EQIX",
+   "PSA",
+   "O",
+   "SPG",
+   "WELL",
+   "DLR",
+   "CCI",
+   "AVB",
+   "EQR",
+   "REG"
+  ],
+  "Basic Materials": [
+   "LIN",
+   "SHW",
+   "APD",
+   "ECL",
+   "NEM",
+   "FCX",
+   "DOW",
+   "NUE",
+   "PPG",
+   "VMC",
+   "MLM",
+   "DD"
+  ],
+  "industry:Credit Services": [
+   "AFRM",
+   "SYF",
+   "COF",
+   "AXP",
+   "ALLY",
+   "SOFI",
+   "UPST",
+   "OMF",
+   "ENVA",
+   "BFH",
+   "SLM",
+   "NAVI"
+  ],
+  "industry:Banks - Diversified": [
+   "JPM",
+   "BAC",
+   "C",
+   "WFC"
+  ],
+  "industry:Banks - Regional": [
+   "USB",
+   "PNC",
+   "TFC",
+   "FITB",
+   "MTB",
+   "HBAN",
+   "RF",
+   "KEY",
+   "CFG",
+   "ZION"
+  ],
+  "industry:Software - Application": [
+   "CRM",
+   "INTU",
+   "ADBE",
+   "NOW",
+   "WDAY",
+   "ADSK",
+   "TEAM",
+   "DDOG",
+   "HUBS",
+   "TYL"
+  ],
+  "industry:Software - Infrastructure": [
+   "MSFT",
+   "ORCL",
+   "PANW",
+   "CRWD",
+   "FTNT",
+   "SNPS",
+   "CDNS",
+   "ZS",
+   "NET",
+   "AKAM"
+  ],
+  "industry:Semiconductors": [
+   "NVDA",
+   "AVGO",
+   "AMD",
+   "QCOM",
+   "TXN",
+   "ADI",
+   "MU",
+   "INTC",
+   "MCHP",
+   "NXPI",
+   "ON",
+   "MRVL"
+  ],
+  "industry:Biotechnology": [
+   "AMGN",
+   "GILD",
+   "VRTX",
+   "REGN",
+   "BIIB",
+   "ALNY",
+   "INCY",
+   "BMRN",
+   "NBIX",
+   "EXEL"
+  ]
+ }
+}

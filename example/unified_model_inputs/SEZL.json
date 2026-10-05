@@ -1,0 +1,20 @@
+{
+  "_note": "Judgement inputs for Sezzle, following the 4 Oct 2026 'Sezzle and MDA Check'. Measurable inputs are fetched from Yahoo; values here override them.",
+  "p3_guide": "raised",
+  "p6_moat": 4,
+  "p6_def": 45,
+  "p6_mgmt": 6,
+  "p7_ins": "routine",
+  "p8_dur": "short",
+  "p8_price": "medium",
+  "p8_cyc": "high",
+  "p8_cmdty": "hurt",
+  "p8_geo": "low",
+  "p8_sec": 6,
+  "p4_overlap": "partial",
+  "p4_weight": 2,
+  "p4_theme": 60,
+  "g_thesis": true,
+  "g_tfsa": true,
+  "g_red": false
+}
