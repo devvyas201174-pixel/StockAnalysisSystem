@@ -1,4 +1,5 @@
 from StockAnalysisSystem.core.Utility.CollectorUtility import us_ticker_to_stock_identity
+from StockAnalysisSystem.core.Utility import unified_model_v2
 from StockAnalysisSystem.core.SubServiceManager import SubServiceContext
 
 
@@ -9,6 +10,14 @@ from StockAnalysisSystem.core.SubServiceManager import SubServiceContext
 
 def us_stock_identity(ticker: str, exchange: str = 'NASDAQ') -> str:
     return us_ticker_to_stock_identity(ticker, exchange)
+
+
+def unified_v2_score(inputs: dict, regime: dict = None) -> dict:
+    return unified_model_v2.score_stock(inputs, regime)
+
+
+def unified_v2_regime(regime: dict = None) -> dict:
+    return unified_model_v2.classify_regime(regime)
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -40,6 +49,10 @@ def init(sub_service_context: SubServiceContext) -> bool:
     subServiceContext = sub_service_context
     subServiceContext.sas_api.register_sys_call(
         'sas_us_stock_identity', us_stock_identity, group='us_market')
+    subServiceContext.sas_api.register_sys_call(
+        'sas_unified_v2_score', unified_v2_score, group='us_market')
+    subServiceContext.sas_api.register_sys_call(
+        'sas_unified_v2_regime', unified_v2_regime, group='us_market')
     return True
 
 
